@@ -11,7 +11,7 @@ jobs:
         run: |
           docker build -t wasm-vips .
           docker run --rm -v ${{ github.workspace }}:/src wasm-vips
-          tar --exclude=wasm-vips.tar.gz -zcvf wasm-vips.tar.gz ${{ github.workspace }}
+          tar --exclude=wasm-vips.tar.gz -zcvf wasm-vips.tar.gz -C ${{ github.workspace }}/lib/ .
       - name: "Upload Artifact"
         uses: actions/upload-artifact@v4
         with:
