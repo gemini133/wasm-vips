@@ -20,7 +20,7 @@ mkdir -p $TARGET
 # Define default arguments
 
 # Specifies the environment(s) to target
-ENVIRONMENT="web,node"
+ENVIRONMENT="web"
 
 # Fixed-width SIMD, enabled by default
 # https://github.com/WebAssembly/simd
@@ -51,19 +51,23 @@ PIC=true
 MODULES=true
 
 # Support for JPEG XL images, enabled by default
-JXL=true
+JXL=false
 
 # Support for AVIF, enabled by default
-AVIF=true
+AVIF=false
 
 # Partial support for SVG load via resvg, enabled by default
-SVG=true
+SVG=false
 
 # Build libvips C++ API, disabled by default
 LIBVIPS_CPP=false
 
 # Build bindings, enabled by default but can be disabled if you only need libvips
 BINDINGS=true
+
+TIFF=false
+WEBP=false
+CGIF=false
 
 # Parse arguments
 while [ $# -gt 0 ]; do
@@ -89,7 +93,7 @@ while [ $# -gt 0 ]; do
 done
 
 # Configure the ENABLE_* and DISABLE_* expansion helpers
-for arg in SIMD WASM_BIGINT JXL AVIF SVG PIC MODULES BINDINGS; do
+for arg in SIMD WASM_BIGINT JXL AVIF SVG PIC MODULES BINDINGS TIFF WEBP CGIF; do
   if [ "${!arg}" = "true" ]; then
     declare ENABLE_$arg=true
   else
@@ -387,7 +391,7 @@ node --version
   meson install -C _build --tag devel
 )
 
-[ -f "$TARGET/lib/pkgconfig/cgif.pc" ] || (
+[ -f "$TARGET/lib/pkgconfig/cgif.pc" ] || [ -n "$DISABLE_CGIF" ]  || (
   stage "Compiling cgif"
   mkdir $DEPS/cgif
   curl -Ls https://github.com/dloebl/cgif/archive/refs/tags/v$VERSION_CGIF.tar.gz | tar xzC $DEPS/cgif --strip-components=1
@@ -397,7 +401,7 @@ node --version
   meson install -C _build --tag devel
 )
 
-[ -f "$TARGET/lib/pkgconfig/libwebp.pc" ] || (
+[ -f "$TARGET/lib/pkgconfig/libwebp.pc" ] || [ -n "$DISABLE_WEBP" ]  || (
   stage "Compiling webp"
   mkdir $DEPS/webp
   curl -Ls https://storage.googleapis.com/downloads.webmproject.org/releases/webp/libwebp-$VERSION_WEBP.tar.gz | tar xzC $DEPS/webp --strip-components=1
@@ -412,7 +416,7 @@ node --version
   make install bin_PROGRAMS= noinst_PROGRAMS= man_MANS=
 )
 
-[ -f "$TARGET/lib/pkgconfig/libtiff-4.pc" ] || (
+[ -f "$TARGET/lib/pkgconfig/libtiff-4.pc" ] || [ -n "$DISABLE_TIFF" ]  || (
   stage "Compiling tiff"
   mkdir $DEPS/tiff
   curl -Ls https://download.osgeo.org/libtiff/tiff-$VERSION_TIFF.tar.gz | tar xzC $DEPS/tiff --strip-components=1 \
