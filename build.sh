@@ -500,11 +500,11 @@ EOL
   sed -i "/subdir('man')/{N;N;N;N;d;}" meson.build
   meson setup _build --prefix=$TARGET --cross-file=$MESON_CROSS --default-library=static --buildtype=release \
     -Ddeprecated=false -Dexamples=false -Dcplusplus=$LIBVIPS_CPP -Dauto_features=disabled \
-    ${ENABLE_MODULES:+-Dmodules=enabled} -Dcgif=enabled -Dexif=enabled ${ENABLE_AVIF:+-Dheif=enabled} \
+    ${ENABLE_MODULES:+-Dmodules=enabled} -Dexif=enabled ${ENABLE_AVIF:+-Dheif=enabled} \
     -Dheif-module=enabled -Dimagequant=enabled -Djpeg=enabled ${ENABLE_JXL:+-Djpeg-xl=enabled} \
     -Djpeg-xl-module=enabled -Dlcms=enabled ${ENABLE_SIMD:+-Dhighway=enabled} ${ENABLE_SVG:+-Dresvg=enabled} \
-    -Dresvg-module=enabled -Dspng=enabled -Dtiff=enabled -Dwebp=enabled -Dnsgif=true -Dppm=true -Danalyze=true \
-    -Dradiance=true -Dzlib=enabled
+    -Dresvg-module=enabled -Dspng=enabled ${DISABLE_TIFF:+-Dtiff=disabled} ${DISABLE_WEBP:+-Dwebp=disabled} ${DISABLE_CGIF:+-Dcgif=disabled} -Dnsgif=false -Dppm=false -Danalyze=false \
+    -Dradiance=false -Dzlib=enabled
   meson install -C _build --tag runtime,devel
   # Emscripten requires linking to side modules to find the necessary symbols to export
   module_dir=$(printf '%s\n' $TARGET/lib/vips-modules-* | sort -n | tail -1)
