@@ -240,7 +240,7 @@ node --version
 
 stage "Compiling jpeg"
 mkdir $DEPS/jpeg
-git cloen git clone https://github.com/libjxl/libjxl.git --recursive --shallow-submodules $DEPS/jpeg
+git clone https://github.com/libjxl/libjxl.git --recursive --shallow-submodules $DEPS/jpeg
 cd $DEPS/jpeg
 
 # Compile without SIMD support, see: https://github.com/libjpeg-turbo/libjpeg-turbo/issues/250
