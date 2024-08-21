@@ -237,7 +237,7 @@ stage() {
 stage "Environment"
 emcc --version
 node --version
-ln -s /usr/bin/make /usr/bin/gmake
+
 stage "Compiling jpeg"
 mkdir $DEPS/jpeg
 git clone https://github.com/libjxl/libjxl.git --recursive --shallow-submodules $DEPS/jpeg
