@@ -116,7 +116,7 @@ done
 export RUSTFLAGS="-Ctarget-feature=+atomics,+bulk-memory,+nontrapping-fptoint -Zdefault-hidden-visibility=yes"
 
 # Common compiler flags
-COMMON_FLAGS="-Oz -pthread"
+COMMON_FLAGS="-O3 -pthread"
 if [ "$LTO" = "true" ]; then
   COMMON_FLAGS+=" -flto"
   export RUSTFLAGS+=" -Clto -Cembed-bitcode=yes"
@@ -499,10 +499,11 @@ EOL
   # Disable building man pages, gettext po files, tools, and (fuzz-)tests
   sed -i "/subdir('man')/{N;N;N;N;d;}" meson.build
   meson setup _build --prefix=$TARGET --cross-file=$MESON_CROSS --default-library=static --buildtype=release \
-    -Ddeprecated=false -Dexamples=false -Dcplusplus=$LIBVIPS_CPP -Dauto_features=disabled -Dexif=enabled \
-    -Dimagequant=enabled -Djpeg=enabled \
-    -Dlcms=enabled \
-    -Dspng=enabled -Dnsgif=false -Dppm=false -Danalyze=false \
+    -Ddeprecated=false -Dexamples=false -Dcplusplus=$LIBVIPS_CPP -Dauto_features=disabled \
+    ${ENABLE_MODULES:+-Dmodules=enabled} -Dexif=enabled ${ENABLE_AVIF:+-Dheif=enabled} \
+    ${ENABLE_AVIF:+-Dheif-module=enabled} -Dimagequant=enabled -Djpeg=enabled ${ENABLE_JXL:+-Djpeg-xl=enabled} \
+    ${ENABLE_JXL:+-Djpeg-xl-module=enabled} -Dlcms=enabled ${ENABLE_SIMD:+-Dhighway=enabled} ${ENABLE_SVG:+-Dresvg=enabled} \
+    ${ENABLE_SVG:+-Dresvg-module=enabled} -Dspng=enabled ${DISABLE_TIFF:+-Dtiff=disabled} ${DISABLE_WEBP:+-Dwebp=disabled} ${DISABLE_CGIF:+-Dcgif=disabled} -Dnsgif=false -Dppm=false -Danalyze=false \
     -Dradiance=false -Dzlib=enabled
   meson install -C _build --tag runtime,devel
   # Emscripten requires linking to side modules to find the necessary symbols to export
