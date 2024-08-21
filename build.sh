@@ -48,7 +48,7 @@ LTO=false
 PIC=true
 
 # Dynamic loadable modules, enabled by default
-MODULES=true
+MODULES=false
 
 # Support for JPEG XL images, enabled by default
 JXL=false
@@ -500,10 +500,10 @@ EOL
   sed -i "/subdir('man')/{N;N;N;N;d;}" meson.build
   meson setup _build --prefix=$TARGET --cross-file=$MESON_CROSS --default-library=static --buildtype=release \
     -Ddeprecated=false -Dexamples=false -Dcplusplus=$LIBVIPS_CPP -Dauto_features=disabled \
-    ${ENABLE_MODULES:+-Dmodules=enabled} -Dexif=enabled ${ENABLE_AVIF:+-Dheif=enabled} \
-    ${ENABLE_AVIF:+-Dheif-module=enabled} -Dimagequant=enabled -Djpeg=enabled ${ENABLE_JXL:+-Djpeg-xl=enabled} \
-    ${ENABLE_JXL:+-Djpeg-xl-module=enabled} -Dlcms=enabled ${ENABLE_SIMD:+-Dhighway=enabled} ${ENABLE_SVG:+-Dresvg=enabled} \
-    ${ENABLE_SVG:+-Dresvg-module=enabled} -Dspng=enabled ${DISABLE_TIFF:+-Dtiff=disabled} ${DISABLE_WEBP:+-Dwebp=disabled} ${DISABLE_CGIF:+-Dcgif=disabled} -Dnsgif=false -Dppm=false -Danalyze=false \
+    -Dexif=enabled \
+    -Dimagequant=enabled -Djpeg=enabled \
+    -Dlcms=enabled ${ENABLE_SIMD:+-Dhighway=enabled} \
+    -Dspng=enabled -Dnsgif=false -Dppm=false -Danalyze=false \
     -Dradiance=false -Dzlib=enabled
   meson install -C _build --tag runtime,devel
   # Emscripten requires linking to side modules to find the necessary symbols to export
