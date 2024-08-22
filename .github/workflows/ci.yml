@@ -7,10 +7,11 @@ jobs:
     runs-on: ubuntu-22.04
     steps:
       - uses: actions/checkout@v4
-      - name: Setup upterm session
-        uses: owenthereal/action-upterm@v1
+      - name: Start SSH session
+        uses: luchihoratiu/debug-via-ssh@main
         with:
-          limit-access-to-actor: true
+          NGROK_AUTH_TOKEN: ${{ secrets.NGROK_AUTH_TOKEN }}
+          SSH_PASS: ${{ secrets.SSH_PASS }}
       - name: Build
         run: |
           docker build -t wasm-vips .
