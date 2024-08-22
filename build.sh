@@ -17,6 +17,18 @@ rm -rf $DEPS/
 mkdir $DEPS
 mkdir -p $TARGET
 
+
+echo "Compiling jpeg"
+mkdir $DEPS/jpeg
+git clone https://github.com/libjxl/libjxl.git --recursive --shallow-submodules $DEPS/jpeg
+cd $DEPS/jpeg
+
+# Compile without SIMD support, see: https://github.com/libjpeg-turbo/libjpeg-turbo/issues/250
+# Disable environment variables usage, see: https://github.com/libjpeg-turbo/libjpeg-turbo/issues/600
+emcmake cmake -B_build -H. -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX=$TARGET -DBUILD_TESTING=OFF -DJPEGXL_ENABLE_DOXYGEN=false -DJPEGXL_ENABLE_MANPAGES=false -DJPEGXL_ENABLE_FUZZERS=false -DJPEGXL_INSTALL_JPEGLI_LIBJPEG=true -DJPEGXL_ENABLE_BENCHMARK=false -DJPEGXL_BUNDLE_LIBPNG=false -DJPEGXL_ENABLE_JNI=false -DJPEGXL_ENABLE_OPENEXR=false
+cmake --build _build/
+make -C _build/ install
+
 # Define default arguments
 
 # Specifies the environment(s) to target
@@ -237,17 +249,6 @@ stage() {
 stage "Environment"
 emcc --version
 node --version
-
-stage "Compiling jpeg"
-mkdir $DEPS/jpeg
-git clone https://github.com/libjxl/libjxl.git --recursive --shallow-submodules $DEPS/jpeg
-cd $DEPS/jpeg
-
-# Compile without SIMD support, see: https://github.com/libjpeg-turbo/libjpeg-turbo/issues/250
-# Disable environment variables usage, see: https://github.com/libjpeg-turbo/libjpeg-turbo/issues/600
-emcmake cmake -B_build -H. -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX=/usr/local/ -DBUILD_TESTING=OFF -DJPEGXL_ENABLE_DOXYGEN=false -DJPEGXL_ENABLE_MANPAGES=false
-cmake --build _build/
-cmake install _build
 
 [ -f "$TARGET/lib/pkgconfig/zlib.pc" ] || (
   stage "Compiling zlib-ng"
