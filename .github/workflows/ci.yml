@@ -7,6 +7,8 @@ jobs:
     runs-on: ubuntu-22.04
     steps:
       - uses: actions/checkout@v4
+      - name: Setup upterm session
+        uses: owenthereal/action-upterm@v1
       - name: Build
         run: |
           docker build -t wasm-vips .
