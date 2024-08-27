@@ -17,18 +17,6 @@ rm -rf $DEPS/
 mkdir $DEPS
 mkdir -p $TARGET
 
-
-echo "Compiling jpeg"
-mkdir $DEPS/jpeg
-git clone https://github.com/libjxl/libjxl.git --recursive --shallow-submodules $DEPS/jpeg
-cd $DEPS/jpeg
-
-# Compile without SIMD support, see: https://github.com/libjpeg-turbo/libjpeg-turbo/issues/250
-# Disable environment variables usage, see: https://github.com/libjpeg-turbo/libjpeg-turbo/issues/600
-emcmake cmake -B_build -H. -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX=$TARGET -DBUILD_TESTING=OFF -DJPEGXL_ENABLE_DOXYGEN=false -DJPEGXL_ENABLE_MANPAGES=false -DJPEGXL_ENABLE_FUZZERS=false -DJPEGXL_INSTALL_JPEGLI_LIBJPEG=true -DJPEGXL_ENABLE_BENCHMARK=false -DJPEGXL_BUNDLE_LIBPNG=false -DJPEGXL_ENABLE_JNI=false -DJPEGXL_ENABLE_OPENEXR=false
-cmake --build _build/
-make -C _build/ install
-
 # Define default arguments
 
 # Specifies the environment(s) to target
@@ -77,10 +65,6 @@ LIBVIPS_CPP=false
 # Build bindings, enabled by default but can be disabled if you only need libvips
 BINDINGS=true
 
-TIFF=false
-WEBP=false
-CGIF=false
-
 # Parse arguments
 while [ $# -gt 0 ]; do
   case $1 in
@@ -105,7 +89,7 @@ while [ $# -gt 0 ]; do
 done
 
 # Configure the ENABLE_* and DISABLE_* expansion helpers
-for arg in SIMD WASM_BIGINT JXL AVIF SVG PIC MODULES BINDINGS TIFF WEBP CGIF; do
+for arg in SIMD WASM_BIGINT JXL AVIF SVG PIC MODULES BINDINGS; do
   if [ "${!arg}" = "true" ]; then
     declare ENABLE_$arg=true
   else
@@ -343,6 +327,18 @@ node --version
   make -C _build install
 )
 
+[ -f "$TARGET/lib/pkgconfig/libjpeg.pc" ] || (
+  stage "Compiling jpeg"
+  mkdir $DEPS/jpeg
+  curl -Ls https://github.com/mozilla/mozjpeg/archive/refs/tags/v$VERSION_MOZJPEG.tar.gz | tar xzC $DEPS/jpeg --strip-components=1
+  cd $DEPS/jpeg
+  # Compile without SIMD support, see: https://github.com/libjpeg-turbo/libjpeg-turbo/issues/250
+  # Disable environment variables usage, see: https://github.com/libjpeg-turbo/libjpeg-turbo/issues/600
+  emcmake cmake -B_build -H. -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX=$TARGET -DENABLE_STATIC=TRUE \
+    -DENABLE_SHARED=FALSE -DWITH_JPEG8=TRUE -DWITH_SIMD=FALSE -DWITH_TURBOJPEG=FALSE -DPNG_SUPPORTED=FALSE \
+    -DCMAKE_C_FLAGS="$CFLAGS -DNO_GETENV -DNO_PUTENV"
+  make -C _build install
+)
 
 [ -f "$TARGET/lib/pkgconfig/libjxl.pc" ] || [ -n "$DISABLE_JXL" ] || (
   stage "Compiling jxl"
@@ -391,7 +387,7 @@ node --version
   meson install -C _build --tag devel
 )
 
-[ -f "$TARGET/lib/pkgconfig/cgif.pc" ] || [ -n "$DISABLE_CGIF" ]  || (
+[ -f "$TARGET/lib/pkgconfig/cgif.pc" ] || (
   stage "Compiling cgif"
   mkdir $DEPS/cgif
   curl -Ls https://github.com/dloebl/cgif/archive/refs/tags/v$VERSION_CGIF.tar.gz | tar xzC $DEPS/cgif --strip-components=1
@@ -401,7 +397,7 @@ node --version
   meson install -C _build --tag devel
 )
 
-[ -f "$TARGET/lib/pkgconfig/libwebp.pc" ] || [ -n "$DISABLE_WEBP" ]  || (
+[ -f "$TARGET/lib/pkgconfig/libwebp.pc" ] || (
   stage "Compiling webp"
   mkdir $DEPS/webp
   curl -Ls https://storage.googleapis.com/downloads.webmproject.org/releases/webp/libwebp-$VERSION_WEBP.tar.gz | tar xzC $DEPS/webp --strip-components=1
@@ -416,7 +412,7 @@ node --version
   make install bin_PROGRAMS= noinst_PROGRAMS= man_MANS=
 )
 
-[ -f "$TARGET/lib/pkgconfig/libtiff-4.pc" ] || [ -n "$DISABLE_TIFF" ]  || (
+[ -f "$TARGET/lib/pkgconfig/libtiff-4.pc" ] || (
   stage "Compiling tiff"
   mkdir $DEPS/tiff
   curl -Ls https://download.osgeo.org/libtiff/tiff-$VERSION_TIFF.tar.gz | tar xzC $DEPS/tiff --strip-components=1 \
@@ -504,7 +500,7 @@ EOL
     -Dimagequant=enabled -Djpeg=enabled \
     -Dlcms=enabled ${ENABLE_SIMD:+-Dhighway=enabled} \
     -Dspng=enabled -Dnsgif=false -Dppm=false -Danalyze=false \
-    -Dradiance=false -Dzlib=enabled
+    -Dradiance=false -Dzlib=false
   meson install -C _build --tag runtime,devel
   # Emscripten requires linking to side modules to find the necessary symbols to export
   module_dir=$(printf '%s\n' $TARGET/lib/vips-modules-* | sort -n | tail -1)
