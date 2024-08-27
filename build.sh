@@ -368,6 +368,21 @@ node --version
   meson install -C _build --tag devel
 )
 
+[ -f "$TARGET/lib/pkgconfig/libwebp.pc" ] || (
+  stage "Compiling webp"
+  mkdir $DEPS/webp
+  curl -Ls https://storage.googleapis.com/downloads.webmproject.org/releases/webp/libwebp-$VERSION_WEBP.tar.gz | tar xzC $DEPS/webp --strip-components=1
+  cd $DEPS/webp
+  # Prepend `-msimd128` to SSE flags, see: https://github.com/emscripten-core/emscripten/issues/12714
+  sed -i 's/-msse/-msimd128 &/g' configure
+  # Disable threading support, we rely on libvips' thread pool
+  emconfigure ./configure --host=$CHOST --prefix=$TARGET --enable-static --disable-shared --disable-dependency-tracking \
+    ${DISABLE_SIMD:+--disable-sse2 --disable-sse4.1} ${ENABLE_SIMD:+--enable-sse2 --enable-sse4.1} --disable-neon \
+    --disable-gl --disable-sdl --disable-png --disable-jpeg --disable-tiff --disable-gif --disable-threading \
+    --enable-libwebpmux --enable-libwebpdemux CPPFLAGS="-DWEBP_DISABLE_STATS -DWEBP_REDUCE_CSP"
+  make install bin_PROGRAMS= noinst_PROGRAMS= man_MANS=
+)
+
 
 [ -f "$TARGET/lib/pkgconfig/vips.pc" ] || (
   stage "Compiling vips"
@@ -382,7 +397,7 @@ node --version
   sed -i "/subdir('man')/{N;N;N;N;d;}" meson.build
   meson setup _build --prefix=$TARGET --cross-file=$MESON_CROSS --default-library=static --buildtype=release \
     -Ddeprecated=false -Dexamples=false -Dcplusplus=$LIBVIPS_CPP -Dauto_features=disabled \
-    -Dexif=enabled \
+    -Dexif=enabled -Dwebp=enabled \
     -Dimagequant=enabled -Djpeg=enabled \
     -Dlcms=enabled ${ENABLE_SIMD:+-Dhighway=enabled} \
     -Dspng=enabled -Dnsgif=false -Dppm=false -Danalyze=false \
