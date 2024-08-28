@@ -24,7 +24,7 @@ ENVIRONMENT="web"
 
 # Fixed-width SIMD, enabled by default
 # https://github.com/WebAssembly/simd
-SIMD=true
+SIMD=false
 
 # JS BigInt to Wasm i64 integration, enabled by default
 # https://github.com/WebAssembly/JS-BigInt-integration
