@@ -120,6 +120,7 @@ set(MAIN_LINK_OPTIONS
         -lembind
         $<$<BOOL:${ENABLE_WASMFS}>:-sWASMFS>
         $<$<BOOL:${ENABLE_MODULES}>:-sMAIN_MODULE=2>
+        -sFORCE_FILESYSTEM=0
         $<$<BOOL:${ENABLE_MODULES}>:--pre-js=${CMAKE_CURRENT_SOURCE_DIR}/modules-pre.js>
         --js-library=${CMAKE_CURRENT_SOURCE_DIR}/vips-library.js
         -sAUTOLOAD_DYLIBS=0
@@ -134,7 +135,7 @@ set(MAIN_LINK_OPTIONS
         -sTEXTDECODER=2
         -sASSERTIONS=0
         -sFORCE_FILESYSTEM
-        -sEXPORTED_RUNTIME_METHODS=FS,ENV,deletionQueue,addFunction,bigintToI53Checked
+        -sEXPORTED_RUNTIME_METHODS=ENV,deletionQueue,addFunction,bigintToI53Checked
         -sEXCEPTION_STACK_TRACES
         -sBINARYEN_EXTRA_PASSES=--emit-target-features
         )
