@@ -102,11 +102,11 @@ done
 
 # Handy for debugging
 #COMMON_FLAGS="-Og -gsource-map -pthread"
-#export EMCC_DEBUG=1
-#export EMCC_DEBUG_SAVE=1
+export EMCC_DEBUG=1
+export EMCC_DEBUG_SAVE=1
 
 # Handy for catching bugs
-#COMMON_FLAGS="-Os -gsource-map -fsanitize=address -pthread"
+COMMON_FLAGS="-Os -gsource-map -fsanitize=address -pthread"
 
 # Specify location where source maps are published (browser specific)
 #export LDFLAGS+=" --source-map-base http://localhost:3000/lib/"
@@ -115,7 +115,7 @@ done
 export RUSTFLAGS="-Ctarget-feature=+atomics,+bulk-memory,+nontrapping-fptoint -Zdefault-hidden-visibility=yes"
 
 # Common compiler flags
-COMMON_FLAGS="-Oz -pthread"
+#COMMON_FLAGS="-Oz -pthread"
 if [ "$LTO" = "true" ]; then
   COMMON_FLAGS+=" -flto"
   export RUSTFLAGS+=" -Clto -Cembed-bitcode=yes"
