@@ -129,7 +129,7 @@ set(MAIN_LINK_OPTIONS
         -sMODULARIZE
         -sEXPORT_NAME='Vips'
         -sEXIT_RUNTIME
-        -sINITIAL_MEMORY=256MB
+        -sINITIAL_MEMORY=1GB
         -sSTACK_SIZE=256KB
         -sALLOW_TABLE_GROWTH
         -sTEXTDECODER=2
