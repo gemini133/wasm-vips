@@ -101,12 +101,12 @@ for arg in SIMD WASM_BIGINT JXL AVIF SVG PIC MODULES BINDINGS WEBP TIFF; do
 done
 
 # Handy for debugging
-#COMMON_FLAGS="-Og -gsource-map -pthread"
+COMMON_FLAGS="-Og -gsource-map -pthread"
 export EMCC_DEBUG=1
 export EMCC_DEBUG_SAVE=1
 
 # Handy for catching bugs
-COMMON_FLAGS="-Os -gsource-map -fsanitize=address -pthread"
+#COMMON_FLAGS="-Os -gsource-map -fsanitize=address -pthread"
 
 # Specify location where source maps are published (browser specific)
 #export LDFLAGS+=" --source-map-base http://localhost:3000/lib/"
@@ -368,7 +368,7 @@ node --version
   meson install -C _build --tag devel
 )
 
-[ -f "$TARGET/lib/pkgconfig/libwebp.pc" ] || (
+[ -f "$TARGET/lib/pkgconfig/libwebp.pc" ]  || [ -n "$DISABLE_WEBP" ] || (
   stage "Compiling webp"
   mkdir $DEPS/webp
   curl -Ls https://storage.googleapis.com/downloads.webmproject.org/releases/webp/libwebp-$VERSION_WEBP.tar.gz | tar xzC $DEPS/webp --strip-components=1
@@ -397,7 +397,7 @@ node --version
   sed -i "/subdir('man')/{N;N;N;N;d;}" meson.build
   meson setup _build --prefix=$TARGET --cross-file=$MESON_CROSS --default-library=static --buildtype=release \
     -Ddeprecated=false -Dexamples=false -Dcplusplus=$LIBVIPS_CPP -Dauto_features=disabled \
-    -Dexif=enabled -Dwebp=enabled \
+    -Dexif=enabled ${ENABLE_WEBP:+-Dwebp=enabled} \
     -Dimagequant=enabled -Djpeg=enabled \
     -Dlcms=enabled ${ENABLE_SIMD:+-Dhighway=enabled} \
     -Dspng=enabled -Dnsgif=false -Dppm=false -Danalyze=false \
