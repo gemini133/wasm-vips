@@ -65,7 +65,7 @@ LIBVIPS_CPP=false
 # Build bindings, enabled by default but can be disabled if you only need libvips
 BINDINGS=true
 
-WEBP=false
+WEBP=true
 TIFF=false
 
 # Parse arguments
