@@ -134,7 +134,6 @@ set(MAIN_LINK_OPTIONS
         -sALLOW_TABLE_GROWTH
         -sTEXTDECODER=2
         -sASSERTIONS=0
-        -sFORCE_FILESYSTEM
         -sEXPORTED_RUNTIME_METHODS=ENV,deletionQueue,addFunction,bigintToI53Checked
         -sEXCEPTION_STACK_TRACES
         -sBINARYEN_EXTRA_PASSES=--emit-target-features
