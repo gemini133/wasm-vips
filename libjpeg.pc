@@ -1,10 +1,9 @@
-prefix=/src/build/target
-exec_prefix=${prefix}
-libdir=${exec_prefix}/lib
-includedir=${prefix}/include
+prefix=/src/build/target/jpegli
+libdir=${prefx}/_build/lib
+includedir=${prefix}/_build/lib/include/jpegli
 
 Name: libjpeg
 Description: A SIMD-accelerated JPEG codec that provides the libjpeg API
 Version: 2.1.5
-Libs: -L${libdir} -ljpeg
-Cflags: -I${includedir}
+Libs: -L${libdir} -l:libjpegli-static.a
+Cflags: -I${prefix} -I${includedir}
